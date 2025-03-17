@@ -4,3 +4,5 @@
 - npm install 
 - npm run dev
 
+## Access Online
+- https://test-talentlytica.pages.dev
