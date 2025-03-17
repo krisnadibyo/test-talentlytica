@@ -1,24 +1,46 @@
 import { useState } from "react";
 
+type StudentProps = {
+  id: number;
+  name: string;
+  score1: number;
+  score2: number;
+  score3: number;
+  score4: number;
+};
+
+const initialStudents: StudentProps[] = new Array(10)
+  .fill(null)
+  .map((_, i) => ({
+    id: i,
+    name: `Mahasiswa ${i + 1}`,
+    score1: 1,
+    score2: 1,
+    score3: 1,
+    score4: 1,
+  }));
+
 function App() {
-  const students = [
-    {
-      id: 1,
-      name: "John Doe",
-      score1: 10,
-      score2: 8,
-      score3: 7,
-      score4: 9,
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      score1: 9,
-      score2: 7,
-      score3: 8,
-      score4: 10,
-    },
-  ];
+  const [students, setStudents] = useState<StudentProps[]>(initialStudents);
+  const [result, setResult] = useState<string>("");
+
+  const handleSave = () => {
+    const res = JSON.stringify(students, null, 2);
+    setResult(res);
+    setStudents(initialStudents);
+  };
+
+  const handleScoreUpdate = (
+    studentId: number,
+    scoreKey: string,
+    value: number
+  ) => {
+    setStudents((prevStudents) =>
+      prevStudents.map((student) =>
+        student.id === studentId ? { ...student, [scoreKey]: value } : student
+      )
+    );
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center w-full p-8">
@@ -68,57 +90,52 @@ function App() {
             {students.map((student) => (
               <StudentScore
                 key={student.id}
+                id={student.id}
                 name={student.name}
                 score1={student.score1}
                 score2={student.score2}
                 score3={student.score3}
                 score4={student.score4}
+                onScoreChange={handleScoreUpdate}
               />
             ))}
           </tbody>
         </table>
       </div>
-      <button className="bg-blue-500 text-white px-4 py-2 rounded-md">
-        Submit
+      <button
+        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+        onClick={handleSave}
+      >
+        Simpan
       </button>
 
       <div className="mt-4 w-full">
-        <textarea className="w-full h-24 border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm mx-auto"
-          disabled={true}
-          value={"test"}
+        <p className="text-sm font-medium mb-1 text-gray-700">
+          Hasil Penilaian:
+        </p>
+        <textarea
+          className="w-full h-64 border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 font-mono text-sm mx-auto"
+          readOnly
+          value={result}
         />
       </div>
     </div>
   );
 }
 
+type StudentScoreProps = StudentProps & {
+  onScoreChange: (studentId: number, scoreKey: string, value: number) => void;
+};
+
 function StudentScore({
+  id,
   name,
   score1,
   score2,
   score3,
   score4,
-}: {
-  name: string;
-  score1: number;
-  score2: number;
-  score3: number;
-  score4: number;
-}) {
-  const [scores, setScores] = useState({
-    score1: score1,
-    score2: score2,
-    score3: score3,
-    score4: score4,
-  });
-
-  const handleScoreChange = (scoreKey: keyof typeof scores, value: number) => {
-    setScores((prev) => ({
-      ...prev,
-      [scoreKey]: value,
-    }));
-  };
-
+  onScoreChange,
+}: StudentScoreProps) {
   const renderOptions = () => {
     const options = [];
     for (let i = 1; i <= 10; i++) {
@@ -139,8 +156,8 @@ function StudentScore({
       <td className="px-6 py-4 whitespace-nowrap text-center">
         <select
           className="border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm mx-auto"
-          value={scores.score1}
-          onChange={(e) => handleScoreChange("score1", Number(e.target.value))}
+          value={score1}
+          onChange={(e) => onScoreChange(id, "score1", Number(e.target.value))}
         >
           {renderOptions()}
         </select>
@@ -148,8 +165,8 @@ function StudentScore({
       <td className="px-6 py-4 whitespace-nowrap text-center">
         <select
           className="border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm mx-auto"
-          value={scores.score2}
-          onChange={(e) => handleScoreChange("score2", Number(e.target.value))}
+          value={score2}
+          onChange={(e) => onScoreChange(id, "score2", Number(e.target.value))}
         >
           {renderOptions()}
         </select>
@@ -157,8 +174,8 @@ function StudentScore({
       <td className="px-6 py-4 whitespace-nowrap text-center">
         <select
           className="border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm mx-auto"
-          value={scores.score3}
-          onChange={(e) => handleScoreChange("score3", Number(e.target.value))}
+          value={score3}
+          onChange={(e) => onScoreChange(id, "score3", Number(e.target.value))}
         >
           {renderOptions()}
         </select>
@@ -166,8 +183,8 @@ function StudentScore({
       <td className="px-6 py-4 whitespace-nowrap text-center">
         <select
           className="border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm mx-auto"
-          value={scores.score4}
-          onChange={(e) => handleScoreChange("score4", Number(e.target.value))}
+          value={score4}
+          onChange={(e) => onScoreChange(id, "score4", Number(e.target.value))}
         >
           {renderOptions()}
         </select>
