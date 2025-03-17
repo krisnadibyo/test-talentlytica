@@ -20,14 +20,38 @@ const initialStudents: StudentProps[] = new Array(10)
     score4: 1,
   }));
 
+// Define the format for the transformed data
+type TransformedScores = {
+  aspek_penilaian_1: Record<string, number>;
+  aspek_penilaian_2: Record<string, number>;
+  aspek_penilaian_3: Record<string, number>;
+  aspek_penilaian_4: Record<string, number>;
+};
+
 function App() {
   const [students, setStudents] = useState<StudentProps[]>(initialStudents);
   const [result, setResult] = useState<string>("");
 
   const handleSave = () => {
-    const res = JSON.stringify(students, null, 2);
+    // Transform the students array into the requested format
+    const transformedData: TransformedScores = {
+      aspek_penilaian_1: {},
+      aspek_penilaian_2: {},
+      aspek_penilaian_3: {},
+      aspek_penilaian_4: {},
+    };
+
+    // Populate the transformed data structure
+    students.forEach((student) => {
+      transformedData.aspek_penilaian_1[student.name.replace(" ","_").toLowerCase()] = student.score1;
+      transformedData.aspek_penilaian_2[student.name.replace(" ","_").toLowerCase()] = student.score2;
+      transformedData.aspek_penilaian_3[student.name.replace(" ","_").toLowerCase()] = student.score3;
+      transformedData.aspek_penilaian_4[student.name.replace(" ","_").toLowerCase()] = student.score4;
+    });
+
+    // Format the JSON with proper indentation
+    const res = JSON.stringify(transformedData, null, 2);
     setResult(res);
-    setStudents(initialStudents);
   };
 
   const handleScoreUpdate = (
